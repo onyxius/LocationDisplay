@@ -13,50 +13,80 @@
 		<AssemblyName>LocationDisplay</AssemblyName>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<Reference Include="MelonLoader">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\net6\MelonLoader.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\net6\MelonLoader.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="0Harmony">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\net6\0Harmony.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\net6\0Harmony.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="Il2CppInterop.Runtime">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="Il2CppInterop.Common">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="Assembly-CSharp">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="UnityEngine.CoreModule">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="UnityEngine.UI">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="UnityEngine.UIModule">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="UnityEngine.InputLegacyModule">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="Unity.TextMeshPro">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="Il2Cppmscorlib">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="Il2CppSystem.Core">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Il2CppAssemblies\Il2CppSystem.Core.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\Il2CppSystem.Core.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="Il2CppSystem">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Il2CppAssemblies\Il2CppSystem.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\Il2CppSystem.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 		<Reference Include="Il2CppScripts">
-			<HintPath>f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Il2CppAssemblies\Il2CppScripts.dll</HintPath>
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\Il2CppScripts.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Il2Cpp__Generated">
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\Il2Cpp__Generated.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine">
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\UnityEngine.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="UnityEngine.IMGUIModule">
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
+			<Private>False</Private>
 		</Reference>
 	</ItemGroup>
 
@@ -67,9 +97,12 @@
 
 	<ItemGroup>
 		<Compile Include="ModMain.cs" />
+		<Compile Include="Hooks\GameHooks.cs" />
+		<Compile Include="LocationDisplayUI.cs" />
+		<Compile Include="Core.cs" />
 	</ItemGroup>
-
+	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;f:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\Mods&quot;" />
+		<Exec Command="powershell -Command &quot;Write-Host 'Copying DLL to Mods folder...'; Copy-Item -Path '$(TargetPath)' -Destination 'F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\Mods' -Force -Verbose; if ($LASTEXITCODE -ne 0) { Write-Host 'Error copying file'; exit 1 } else { Write-Host 'File copied successfully' }&quot;" />
 	</Target>
 </Project>

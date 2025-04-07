@@ -1,6 +1,7 @@
 using HarmonyLib;
 using UnityEngine;
 using Il2Cpp;
+using Il2CppScripts;
 
 namespace LocationDisplay.Hooks;
 
@@ -9,10 +10,10 @@ public class GameHooks
     private static string currentZone = "Unknown";
     private static string currentTime = "00:00";
 
-    [HarmonyPatch(typeof(Player), nameof(Player.Update))]
+    [HarmonyPatch(typeof(Il2CppScripts.Player), nameof(Il2CppScripts.Player.Update))]
     public class PlayerUpdateHook
     {
-        private static void Postfix(Player __instance)
+        private static void Postfix(Il2CppScripts.Player __instance)
         {
             if (__instance == null) return;
 
