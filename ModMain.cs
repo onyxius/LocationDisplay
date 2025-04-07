@@ -7,41 +7,234 @@ using Il2CppTMPro;
 using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime.Injection;
+using System.Runtime.InteropServices;
+using Il2CppInterop.Runtime;
+using UnityEditor;
 
-[assembly: MelonInfo(typeof(CoordinatesDisplay.ModMain), "Coordinates Display", "1.0.0", "Onyxi")]
+[assembly: MelonInfo(typeof(LocationDisplay.ModMain), "Location Display", "1.0.0", "Onyxi")]
 [assembly: MelonGame("Visionary Realms", "Pantheon")]
 [assembly: MelonColor(34, 139, 34, 255)] // Forest Green RGB values with alpha
 
-namespace CoordinatesDisplay
+namespace LocationDisplay
 {
+    public class UIHandler : MonoBehaviour
+    {
+        private RectTransform rectTransform;
+        private Image backgroundImage;
+        private bool isDragging;
+        private Vector2 dragStartPosition;
+        private Vector2 dragStartMousePosition;
+        private MelonPreferences_Category config;
+        private string currentLocationText = "";
+
+        [DllImport("user32.dll")]
+        private static extern bool OpenClipboard(System.IntPtr hWndNewOwner);
+
+        [DllImport("user32.dll")]
+        private static extern bool CloseClipboard();
+
+        [DllImport("user32.dll")]
+        private static extern bool EmptyClipboard();
+
+        [DllImport("user32.dll")]
+        private static extern System.IntPtr SetClipboardData(uint uFormat, System.IntPtr data);
+
+        [DllImport("kernel32.dll")]
+        private static extern System.IntPtr GlobalAlloc(uint uFlags, UIntPtr dwBytes);
+
+        [DllImport("kernel32.dll")]
+        private static extern System.IntPtr GlobalLock(System.IntPtr hMem);
+
+        [DllImport("kernel32.dll")]
+        private static extern bool GlobalUnlock(System.IntPtr hMem);
+
+        [DllImport("kernel32.dll")]
+        private static extern System.IntPtr GlobalFree(System.IntPtr hMem);
+
+        private const uint GMEM_MOVEABLE = 0x0002;
+        private const uint CF_UNICODETEXT = 13;
+
+        public void Initialize(RectTransform rect, Image image, MelonPreferences_Category cfg)
+        {
+            rectTransform = rect;
+            backgroundImage = image;
+            config = cfg;
+            CreateCopyButton();
+        }
+
+        private void CreateCopyButton()
+        {
+            var buttonObj = new GameObject("CopyButton");
+            buttonObj.transform.SetParent(transform, false);
+            
+            var buttonRect = buttonObj.AddComponent<RectTransform>();
+            buttonRect.anchorMin = new Vector2(0, 0);
+            buttonRect.anchorMax = new Vector2(1, 0);
+            buttonRect.pivot = new Vector2(0.5f, 0);
+            buttonRect.sizeDelta = new Vector2(0, 25);
+            buttonRect.anchoredPosition = new Vector2(0, -30);
+
+            var buttonImage = buttonObj.AddComponent<Image>();
+            buttonImage.color = new Color(0.2f, 0.2f, 0.2f, 0.8f);
+
+            var buttonText = new GameObject("ButtonText");
+            buttonText.transform.SetParent(buttonObj.transform, false);
+            
+            var textRect = buttonText.AddComponent<RectTransform>();
+            textRect.anchorMin = Vector2.zero;
+            textRect.anchorMax = Vector2.one;
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+
+            var tmp = buttonText.AddComponent<TextMeshProUGUI>();
+            tmp.text = "Copy Location";
+            tmp.fontSize = 12;
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.color = Color.white;
+
+            var button = buttonObj.AddComponent<Button>();
+            button.targetGraphic = buttonImage;
+
+            // Convert the method to an Il2Cpp action
+            var il2cppAction = DelegateSupport.ConvertDelegate<UnityAction>(new System.Action(CopyToClipboard));
+            button.onClick.AddListener(il2cppAction);
+
+            // Add hover effect using mouse events
+            buttonObj.AddComponent<ButtonHoverHandler>().Initialize(buttonImage);
+        }
+
+        public void SetLocationText(string text)
+        {
+            currentLocationText = text;
+        }
+
+        private void CopyToClipboard()
+        {
+            if (string.IsNullOrEmpty(currentLocationText)) return;
+
+            var ptr = System.IntPtr.Zero;
+            try
+            {
+                OpenClipboard(System.IntPtr.Zero);
+                EmptyClipboard();
+                var bytes = System.Text.Encoding.Unicode.GetBytes(currentLocationText + "\0");
+                ptr = GlobalAlloc(GMEM_MOVEABLE, (UIntPtr)bytes.Length);
+                var locked = GlobalLock(ptr);
+                System.Runtime.InteropServices.Marshal.Copy(bytes, 0, locked, bytes.Length);
+                GlobalUnlock(ptr);
+                SetClipboardData(CF_UNICODETEXT, ptr);
+            }
+            finally
+            {
+                CloseClipboard();
+                if (ptr != System.IntPtr.Zero)
+                {
+                    GlobalFree(ptr);
+                }
+            }
+        }
+
+        private void Update()
+        {
+            if (rectTransform == null || backgroundImage == null) return;
+
+            var mousePos = UnityEngine.Input.mousePosition;
+            var isMouseOver = RectTransformUtility.RectangleContainsScreenPoint(rectTransform, mousePos);
+
+            // Handle hover effect
+            backgroundImage.color = new Color(0, 0, 0, isMouseOver || isDragging ? 0.8f : 0.5f);
+
+            // Handle dragging
+            if (UnityEngine.Input.GetMouseButtonDown(0) && isMouseOver)
+            {
+                isDragging = true;
+                dragStartPosition = rectTransform.anchoredPosition;
+                dragStartMousePosition = mousePos;
+            }
+            else if (UnityEngine.Input.GetMouseButtonUp(0) && isDragging)
+            {
+                isDragging = false;
+                // Save position
+                config.GetEntry<float>("xPos").Value = rectTransform.anchoredPosition.x;
+                config.GetEntry<float>("yPos").Value = rectTransform.anchoredPosition.y;
+                config.SaveToFile(false);
+            }
+
+            if (isDragging)
+            {
+                Vector2 difference = (Vector2)mousePos - dragStartMousePosition;
+                rectTransform.anchoredPosition = dragStartPosition + difference;
+                
+                // Prevent mouse input from reaching the game
+                UnityEngine.Input.ResetInputAxes();
+            }
+        }
+    }
+
+    public class ButtonHoverHandler : MonoBehaviour
+    {
+        private Image buttonImage;
+        private Color normalColor = new Color(0.2f, 0.2f, 0.2f, 0.8f);
+        private Color hoverColor = new Color(0.3f, 0.3f, 0.3f, 0.9f);
+        private Color pressedColor = new Color(0.1f, 0.1f, 0.1f, 1f);
+
+        public void Initialize(Image image)
+        {
+            buttonImage = image;
+            buttonImage.color = normalColor;
+        }
+
+        private void OnPointerEnter()
+        {
+            if (buttonImage != null)
+                buttonImage.color = hoverColor;
+        }
+
+        private void OnPointerExit()
+        {
+            if (buttonImage != null)
+                buttonImage.color = normalColor;
+        }
+
+        private void OnPointerDown()
+        {
+            if (buttonImage != null)
+                buttonImage.color = pressedColor;
+        }
+
+        private void OnPointerUp()
+        {
+            if (buttonImage != null)
+                buttonImage.color = normalColor;
+        }
+    }
+
     public class ModMain : MelonMod
     {
         private static HarmonyLib.Harmony harmony;
         public static MelonPreferences_Category Config { get; private set; }
         private static GameObject displayCanvas;
         private static GameObject displayPanel;
-        private static TextMeshProUGUI displayText;
+        private static TextMeshProUGUI timeText;
+        private static TextMeshProUGUI locationText;
         private static RectTransform displayRect;
-        private static bool isDragging;
-        private static Vector2 dragStartPosition;
-        private static Vector2 dragStartMousePosition;
+        private static UIHandler uiHandler;
 
         public override void OnInitializeMelon()
         {
             try
             {
-                // Register our custom types with Il2Cpp
-                ClassInjector.RegisterTypeInIl2Cpp<WindowDragHandler>();
-                ClassInjector.RegisterTypeInIl2Cpp<HoverHandler>();
+                // Register custom types
+                ClassInjector.RegisterTypeInIl2Cpp<UIHandler>();
 
                 // Initialize preferences
-                Config = MelonPreferences.CreateCategory("Coordinates_Display");
+                Config = MelonPreferences.CreateCategory("Location_Display");
                 Config.CreateEntry("xPos", 10f);
                 Config.CreateEntry("yPos", 10f);
                 Config.CreateEntry("fontSize", 14);
 
                 // Initialize Harmony
-                harmony = new HarmonyLib.Harmony("com.onyxi.coordinatesdisplay");
+                harmony = new HarmonyLib.Harmony("com.onyxi.locationdisplay");
                 harmony.PatchAll(typeof(ModMain).Assembly);
 
                 // Clean up any existing UI
@@ -50,7 +243,7 @@ namespace CoordinatesDisplay
                 // Create UI
                 CreateUI();
 
-                LoggerInstance.Msg("Coordinates Display mod initialized!");
+                LoggerInstance.Msg("Location Display mod initialized!");
             }
             catch (System.Exception ex)
             {
@@ -60,7 +253,7 @@ namespace CoordinatesDisplay
 
         private void CleanupUI()
         {
-            var existingCanvas = GameObject.Find("CoordinatesDisplayCanvas");
+            var existingCanvas = GameObject.Find("LocationDisplayCanvas");
             if (existingCanvas != null)
             {
                 GameObject.Destroy(existingCanvas);
@@ -70,7 +263,7 @@ namespace CoordinatesDisplay
         private void CreateUI()
         {
             // Create canvas
-            displayCanvas = new GameObject("CoordinatesDisplayCanvas");
+            displayCanvas = new GameObject("LocationDisplayCanvas");
             var canvas = displayCanvas.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 9999;
@@ -82,8 +275,8 @@ namespace CoordinatesDisplay
             displayCanvas.AddComponent<GraphicRaycaster>();
             UnityEngine.Object.DontDestroyOnLoad(displayCanvas);
 
-            // Create panel
-            displayPanel = new GameObject("CoordinatesDisplayPanel");
+            // Create main panel
+            displayPanel = new GameObject("LocationDisplayPanel");
             displayPanel.transform.SetParent(displayCanvas.transform, false);
 
             // Add background image
@@ -92,7 +285,7 @@ namespace CoordinatesDisplay
 
             // Setup RectTransform
             displayRect = displayPanel.GetComponent<RectTransform>();
-            displayRect.sizeDelta = new Vector2(300, 80);
+            displayRect.sizeDelta = new Vector2(300, 100);
             displayRect.anchorMin = Vector2.zero;
             displayRect.anchorMax = Vector2.zero;
             displayRect.pivot = Vector2.zero;
@@ -102,23 +295,44 @@ namespace CoordinatesDisplay
             float yPos = Config.GetEntry<float>("yPos").Value;
             displayRect.anchoredPosition = new Vector2(xPos, yPos);
 
-            // Create text
-            var textObj = new GameObject("CoordinatesDisplayText");
-            textObj.transform.SetParent(displayPanel.transform, false);
+            // Create time text (centered at top)
+            var timeObj = new GameObject("TimeText");
+            timeObj.transform.SetParent(displayPanel.transform, false);
 
-            var textRect = textObj.GetComponent<RectTransform>();
-            if (textRect == null) textRect = textObj.AddComponent<RectTransform>();
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = new Vector2(5, 5);
-            textRect.offsetMax = new Vector2(-5, -5);
+            var timeRect = timeObj.AddComponent<RectTransform>();
+            timeRect.anchorMin = new Vector2(0, 1);
+            timeRect.anchorMax = new Vector2(1, 1);
+            timeRect.pivot = new Vector2(0.5f, 1);
+            timeRect.sizeDelta = new Vector2(0, 25);
+            timeRect.anchoredPosition = new Vector2(0, -5);
 
-            displayText = textObj.AddComponent<TextMeshProUGUI>();
-            displayText.fontSize = Config.GetEntry<int>("fontSize").Value;
-            displayText.color = Color.white;
-            displayText.alignment = TextAlignmentOptions.Left;
-            displayText.enableWordWrapping = false;
-            displayText.overflowMode = TextOverflowModes.Overflow;
+            timeText = timeObj.AddComponent<TextMeshProUGUI>();
+            timeText.fontSize = Config.GetEntry<int>("fontSize").Value;
+            timeText.color = Color.white;
+            timeText.alignment = TextAlignmentOptions.Center;
+            timeText.enableWordWrapping = false;
+            timeText.overflowMode = TextOverflowModes.Overflow;
+
+            // Create location text
+            var locationObj = new GameObject("LocationText");
+            locationObj.transform.SetParent(displayPanel.transform, false);
+
+            var locationRect = locationObj.AddComponent<RectTransform>();
+            locationRect.anchorMin = new Vector2(0, 0);
+            locationRect.anchorMax = new Vector2(1, 1);
+            locationRect.offsetMin = new Vector2(5, 25);
+            locationRect.offsetMax = new Vector2(-5, -30);
+
+            locationText = locationObj.AddComponent<TextMeshProUGUI>();
+            locationText.fontSize = Config.GetEntry<int>("fontSize").Value;
+            locationText.color = Color.white;
+            locationText.alignment = TextAlignmentOptions.Left;
+            locationText.enableWordWrapping = false;
+            locationText.overflowMode = TextOverflowModes.Overflow;
+
+            // Add UI handler
+            uiHandler = displayPanel.AddComponent<UIHandler>();
+            uiHandler.Initialize(displayRect, image, Config);
 
             // Ensure we have an event system
             if (GameObject.Find("EventSystem") == null)
@@ -134,14 +348,10 @@ namespace CoordinatesDisplay
         {
             try
             {
-                // Handle UI interactions
-                HandleUIInteractions();
-
-                // Update display
                 var player = GameObject.Find("LocalPlayer");
                 if (player == null)
                 {
-                    UpdateDisplay("Location: Unknown\nTime: 00:00");
+                    UpdateDisplay("00:00", "Location: Unknown");
                     return;
                 }
 
@@ -149,16 +359,15 @@ namespace CoordinatesDisplay
                 var rotation = player.transform.eulerAngles.y;
                 var cardinal = GetCardinalDirection(rotation);
 
-                var timeText = GameObject.Find("TimeText")?.GetComponent<TextMeshProUGUI>();
-                var timeStr = timeText != null ? timeText.text : "00:00";
+                var gameTimeText = GameObject.Find("TimeText")?.GetComponent<TextMeshProUGUI>();
+                var timeStr = gameTimeText != null ? gameTimeText.text : "00:00";
 
-                var displayStr = $"Time: {timeStr}\n" +
-                               $"E/W: {position.x:F1}\n" +
-                               $"Up/Down: {position.y:F1}\n" +
-                               $"N/S: {position.z:F1}\n" +
-                               $"Facing: {rotation:F0}° ({cardinal})";
+                var locationStr = $"E/W: {position.x:F1}\n" +
+                                $"Up/Down: {position.y:F1}\n" +
+                                $"N/S: {position.z:F1}\n" +
+                                $"Facing: {rotation:F0}° ({cardinal})";
 
-                UpdateDisplay(displayStr);
+                UpdateDisplay(timeStr, locationStr);
             }
             catch (System.Exception ex)
             {
@@ -169,54 +378,25 @@ namespace CoordinatesDisplay
             }
         }
 
-        private void HandleUIInteractions()
-        {
-            if (displayPanel == null) return;
-
-            var mousePos = UnityEngine.Input.mousePosition;
-            var image = displayPanel.GetComponent<Image>();
-            var isMouseOver = RectTransformUtility.RectangleContainsScreenPoint(displayRect, mousePos);
-
-            // Handle hover effect
-            if (image != null)
-            {
-                image.color = new Color(0, 0, 0, isMouseOver ? 0.8f : 0.5f);
-            }
-
-            // Handle dragging
-            if (UnityEngine.Input.GetMouseButtonDown(0) && isMouseOver)
-            {
-                isDragging = true;
-                dragStartPosition = displayRect.anchoredPosition;
-                dragStartMousePosition = mousePos;
-            }
-            else if (UnityEngine.Input.GetMouseButtonUp(0) && isDragging)
-            {
-                isDragging = false;
-                // Save position
-                Config.GetEntry<float>("xPos").Value = displayRect.anchoredPosition.x;
-                Config.GetEntry<float>("yPos").Value = displayRect.anchoredPosition.y;
-                Config.SaveToFile(false);
-            }
-
-            if (isDragging)
-            {
-                Vector2 difference = (Vector2)mousePos - dragStartMousePosition;
-                displayRect.anchoredPosition = dragStartPosition + difference;
-            }
-        }
-
         private string GetCardinalDirection(float angle)
         {
             string[] cardinals = { "N", "NE", "E", "SE", "S", "SW", "W", "NW", "N" };
             return cardinals[(int)Mathf.Round(angle / 45f)];
         }
 
-        private void UpdateDisplay(string text)
+        private void UpdateDisplay(string time, string location)
         {
-            if (displayText != null)
+            if (timeText != null)
             {
-                displayText.text = text;
+                timeText.text = time;
+            }
+            if (locationText != null)
+            {
+                locationText.text = location;
+                if (uiHandler != null)
+                {
+                    uiHandler.SetLocationText(location);
+                }
             }
         }
 
@@ -241,120 +421,6 @@ namespace CoordinatesDisplay
         public static void SaveConfig()
         {
             Config?.SaveToFile(false);
-        }
-    }
-
-    // Window drag handler component
-    public class WindowDragHandler : MonoBehaviour
-    {
-        private RectTransform rectTransform;
-        private bool isDragging;
-        private Vector2 dragStartPosition;
-        private Vector2 dragStartMousePosition;
-
-        public void Initialize(RectTransform rect)
-        {
-            rectTransform = rect;
-            var eventTrigger = gameObject.AddComponent<EventTrigger>();
-
-            // Add pointer down event
-            var pointerDown = new EventTrigger.Entry();
-            pointerDown.eventID = EventTriggerType.PointerDown;
-            pointerDown.callback = new EventTrigger.TriggerEvent();
-            pointerDown.callback.AddListener((data) => OnPointerDown());
-            eventTrigger.triggers.Add(pointerDown);
-
-            // Add pointer up event
-            var pointerUp = new EventTrigger.Entry();
-            pointerUp.eventID = EventTriggerType.PointerUp;
-            pointerUp.callback = new EventTrigger.TriggerEvent();
-            pointerUp.callback.AddListener((data) => OnPointerUp());
-            eventTrigger.triggers.Add(pointerUp);
-
-            // Add drag event
-            var drag = new EventTrigger.Entry();
-            drag.eventID = EventTriggerType.Drag;
-            drag.callback = new EventTrigger.TriggerEvent();
-            drag.callback.AddListener((data) => OnDrag((PointerEventData)data));
-            eventTrigger.triggers.Add(drag);
-        }
-
-        private void OnPointerDown()
-        {
-            isDragging = true;
-            dragStartPosition = rectTransform.anchoredPosition;
-            dragStartMousePosition = UnityEngine.Input.mousePosition;
-        }
-
-        private void OnPointerUp()
-        {
-            if (isDragging)
-            {
-                isDragging = false;
-                // Save the new position
-                ModMain.xPos = rectTransform.anchoredPosition.x;
-                ModMain.yPos = rectTransform.anchoredPosition.y;
-                ModMain.Config.GetEntry<float>("xPos").Value = ModMain.xPos;
-                ModMain.Config.GetEntry<float>("yPos").Value = ModMain.yPos;
-                ModMain.SaveConfig();
-            }
-        }
-
-        private void OnDrag(PointerEventData eventData)
-        {
-            if (isDragging && rectTransform != null)
-            {
-                Vector2 currentMousePosition = UnityEngine.Input.mousePosition;
-                Vector2 difference = currentMousePosition - dragStartMousePosition;
-                rectTransform.anchoredPosition = dragStartPosition + difference;
-            }
-        }
-    }
-
-    // Hover effect handler component
-    public class HoverHandler : MonoBehaviour
-    {
-        private Image targetImage;
-        private Color defaultColor;
-        private Color hoverColor;
-
-        public void Initialize(Image image, Color defaultCol, Color hoverCol)
-        {
-            targetImage = image;
-            defaultColor = defaultCol;
-            hoverColor = hoverCol;
-
-            var eventTrigger = gameObject.AddComponent<EventTrigger>();
-
-            // Add pointer enter event
-            var pointerEnter = new EventTrigger.Entry();
-            pointerEnter.eventID = EventTriggerType.PointerEnter;
-            pointerEnter.callback = new EventTrigger.TriggerEvent();
-            pointerEnter.callback.AddListener((data) => OnPointerEnter());
-            eventTrigger.triggers.Add(pointerEnter);
-
-            // Add pointer exit event
-            var pointerExit = new EventTrigger.Entry();
-            pointerExit.eventID = EventTriggerType.PointerExit;
-            pointerExit.callback = new EventTrigger.TriggerEvent();
-            pointerExit.callback.AddListener((data) => OnPointerExit());
-            eventTrigger.triggers.Add(pointerExit);
-        }
-
-        private void OnPointerEnter()
-        {
-            if (targetImage != null)
-            {
-                targetImage.color = hoverColor;
-            }
-        }
-
-        private void OnPointerExit()
-        {
-            if (targetImage != null)
-            {
-                targetImage.color = defaultColor;
-            }
         }
     }
 } 

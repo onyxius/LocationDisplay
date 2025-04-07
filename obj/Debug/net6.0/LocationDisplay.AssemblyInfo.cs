@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("CoordinatesDisplay")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("LocationDisplay")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
-[assembly: System.Reflection.AssemblyProductAttribute("CoordinatesDisplay")]
-[assembly: System.Reflection.AssemblyTitleAttribute("CoordinatesDisplay")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e352a5254e5cc2ab45c8e043baf3361f0fac0ca8")]
+[assembly: System.Reflection.AssemblyProductAttribute("LocationDisplay")]
+[assembly: System.Reflection.AssemblyTitleAttribute("LocationDisplay")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 [assembly: System.Resources.NeutralResourcesLanguageAttribute("en-US")]
 

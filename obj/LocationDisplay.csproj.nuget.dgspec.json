@@ -8,7 +8,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "D:\\Game_Modding\\PantheonRotF\\LocationDisplay\\LocationDisplay\\LocationDisplay.csproj",
-        "projectName": "CoordinatesDisplay",
+        "projectName": "LocationDisplay",
         "projectPath": "D:\\Game_Modding\\PantheonRotF\\LocationDisplay\\LocationDisplay\\LocationDisplay.csproj",
         "packagesPath": "C:\\Users\\onyxi\\.nuget\\packages\\",
         "outputPath": "D:\\Game_Modding\\PantheonRotF\\LocationDisplay\\LocationDisplay\\obj\\",
