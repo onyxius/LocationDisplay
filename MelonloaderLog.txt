@@ -1,0 +1,235 @@
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=4194304"
+    "memorysetup-bucket-allocator-block-count=1"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=4194304"
+    "memorysetup-profiler-bucket-allocator-block-count=1"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=4194304"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-preload-manager=262144"
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+    "memorysetup-temp-allocator-size-gfx=262144"
+
+[11:50:18.007] ------------------------------
+[11:50:18.011] MelonLoader v0.7.1-ci.2238 Open-Beta
+[11:50:18.012] OS: Windows 10
+[11:50:18.013] Hash Code: 0889C47ACE6582746238D64BCA00601E9776381D23279F999A81193F1F8F9573
+[11:50:18.014] ------------------------------
+[11:50:18.015] Game Type: Il2cpp
+[11:50:18.016] Game Arch: x64
+[11:50:18.017] ------------------------------
+[11:50:18.018] Command-Line:
+[11:50:18.019] ------------------------------
+[11:50:18.021] Core::BasePath = F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen
+[11:50:18.022] Game::BasePath = F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen
+[11:50:18.023] Game::DataPath = F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\Pantheon_Data
+[11:50:18.025] Game::ApplicationPath = F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\Pantheon.exe
+[11:50:18.026] Runtime Type: net6
+[11:50:18.123] ------------------------------
+[11:50:18.124] Game Name: Pantheon
+[11:50:18.125] Game Developer: Visionary Realms
+[11:50:18.128] Unity Version: 6000.0.42f1
+[11:50:18.129] Game Version: 1.0
+[11:50:18.130] ------------------------------
+
+[11:50:18.823] Preferences Loaded!
+
+[11:50:18.841] Loading UserLibs...
+[11:50:18.863] ------------------------------
+[11:50:18.882] Melon Assembly loaded: '.\UserLibs\UniverseLib.ML.IL2CPP.Interop.dll'
+[11:50:18.883] SHA256 Hash: '4788E8A8B745FB28DE0DBF119A17C87CED90D386DF60348B6A0C597F11EF0C19'
+[11:50:18.884] ------------------------------
+[11:50:18.885] 0 UserLibs loaded.
+
+[11:50:18.886] Loading Plugins...
+[11:50:18.892] 0 Plugins loaded.
+
+﻿﻿[11:50:21.008] Loading Il2CppAssemblyGenerator...
+[11:50:21.034] [Il2CppAssemblyGenerator] Contacting RemoteAPI...
+[11:50:21.369] [Il2CppAssemblyGenerator] Game Not Found on RemoteAPI Host (https://api.melonloader.com/api/v1/game/pantheon)
+[11:50:21.370] [Il2CppAssemblyGenerator] RemoteAPI.DumperVersion = null
+[11:50:21.371] [Il2CppAssemblyGenerator] RemoteAPI.ObfuscationRegex = null
+[11:50:21.371] [Il2CppAssemblyGenerator] RemoteAPI.MappingURL = null
+[11:50:21.372] [Il2CppAssemblyGenerator] RemoteAPI.MappingFileSHA512 = null
+[11:50:21.377] [Il2CppAssemblyGenerator] Using Cpp2IL Version: 2022.1.0-pre-release.19
+[11:50:21.377] [Il2CppAssemblyGenerator] Using Il2CppInterop Version = 1.4.6-ci.579+9d4599dc78d69ede49a2ee96a1ccf41eec02db5b
+[11:50:21.378] [Il2CppAssemblyGenerator] Using Unity Dependencies Version = 6000.0.42
+[11:50:21.379] [Il2CppAssemblyGenerator] Using Deobfuscation Regex = null
+[11:50:21.380] [Il2CppAssemblyGenerator] Cpp2IL is up to date.
+[11:50:21.381] [Il2CppAssemblyGenerator] Cpp2IL.Plugin.StrippedCodeRegSupport is up to date.
+[11:50:21.382] [Il2CppAssemblyGenerator] UnityDependencies is up to date.
+[11:50:21.383] [Il2CppAssemblyGenerator] Checking GameAssembly...
+[11:50:21.600] [Il2CppAssemblyGenerator] Assembly is up to date. No Generation Needed.
+
+[11:50:21.602] Loading Mods...
+[11:50:21.630] ------------------------------
+[11:50:21.632] Melon Assembly loaded: '.\Mods\CoordinatesDisplay.dll'
+[11:50:21.633] SHA256 Hash: '2DEAE3127CAE2F8F8D8A41C21C9EC8DE0AC347FDE83D93904AC0FA7692E9C57B'
+[11:50:21.635] Melon Assembly loaded: '.\Mods\EnhancedExperienceBar.dll'
+[11:50:21.636] SHA256 Hash: 'EF8784D0F3D682F06D334A73CF6ED301A366A02F4485500476FAD907B15092ED'
+[11:50:21.638] Melon Assembly loaded: '.\Mods\LocationDisplay.dll'
+[11:50:21.638] SHA256 Hash: '92FA0184D5CE9BF5F365A7D96D15080BDCABBC56D7751EAB1B58A15A5C9148D0'
+[11:50:21.640] Melon Assembly loaded: '.\Mods\OpenBagsOnTrade.dll'
+[11:50:21.641] SHA256 Hash: 'DCB916F867E5E9E8C000F32FB57EAD901874147ECF95B76297C4D1944EAEE83B'
+[11:50:21.644] Melon Assembly loaded: '.\Mods\PantheonQuestProgressTrackerMod.dll'
+[11:50:21.645] SHA256 Hash: 'F4E11147747C289DC937DF4205EB2DFAA9342E6EE651EC5466BFB106BE393489'
+[11:50:21.649] Melon Assembly loaded: '.\Mods\PantheonStorageAsBagMod.dll'
+[11:50:21.649] SHA256 Hash: '1019CD56D69C03B411D8638B7E2572CD77ECC9A24212EFF77C0EECB0EB0B65FC'
+[11:50:21.652] Melon Assembly loaded: '.\Mods\PixelPerfect.dll'
+[11:50:21.652] SHA256 Hash: 'FBA785536D25A6FF7AE01471F0D4FFCEE8893F092AFD2C895B0BA33C4888584E'
+[11:50:21.654] Melon Assembly loaded: '.\Mods\ShowItemVendorPrice.dll'
+[11:50:21.655] SHA256 Hash: '6C8C1E96A4B08F2A452EC2B6AE27D31F38D96D6309F32D378E4DDFC5ED6E8112'
+[11:50:21.658] Melon Assembly loaded: '.\Mods\UIMovementSnapping.dll'
+[11:50:21.659] SHA256 Hash: '92B306D064281F7B390F07E5DE54E32D922F6CFF81DBE1CC25232B9C909F9518'
+[11:50:21.684] Melon Assembly loaded: '.\Mods\UnityExplorer.ML.IL2CPP.CoreCLR.dll'
+[11:50:21.685] SHA256 Hash: '1CF0B819AA21A42E6A3FE1C8044D376F1F635176D643C980F71A6A2F11BDEE35'
+
+[11:50:22.045] ------------------------------
+[11:50:22.046] Coordinates Display v1.0.0
+[11:50:22.047] by Onyxi
+[11:50:22.048] Assembly: CoordinatesDisplay.dll
+[11:50:22.049] ------------------------------
+[11:50:22.053] ------------------------------
+[11:50:22.054] EnhancedExperienceBar v1.0.0
+[11:50:22.055] by Roast
+[11:50:22.057] Assembly: EnhancedExperienceBar.dll
+[11:50:22.058] ------------------------------
+[11:50:22.062] ------------------------------
+[11:50:22.062] Location Display v1.0.0
+[11:50:22.063] by Onyxi
+[11:50:22.064] Assembly: LocationDisplay.dll
+[11:50:22.065] ------------------------------
+[11:50:22.070] ------------------------------
+[11:50:22.071] OpenBagsOnTrade v1.0.0
+[11:50:22.072] by ModsOfPantheon
+[11:50:22.073] Assembly: OpenBagsOnTrade.dll
+[11:50:22.074] ------------------------------
+[11:50:22.078] ------------------------------
+[11:50:22.078] Pantheon Quest Progress Tracker v0.9.1
+[11:50:22.079] by Mallyrn
+[11:50:22.080] Assembly: PantheonQuestProgressTrackerMod.dll
+[11:50:22.081] ------------------------------
+[11:50:22.085] ------------------------------
+[11:50:22.086] Pantheon Storage As Bag Mod v0.9.1
+[11:50:22.087] by Mallyrn
+[11:50:22.088] Assembly: PantheonStorageAsBagMod.dll
+[11:50:22.089] ------------------------------
+[11:50:22.093] ------------------------------
+[11:50:22.093] PixelPerfect v1.0.0
+[11:50:22.094] by Confusion
+[11:50:22.097] Assembly: PixelPerfect.dll
+[11:50:22.098] ------------------------------
+[11:50:22.102] ------------------------------
+[11:50:22.102] ShowItemVendorPrice v1.0.0
+[11:50:22.103] by ModsOfPantheon
+[11:50:22.104] Assembly: ShowItemVendorPrice.dll
+[11:50:22.106] ------------------------------
+[11:50:22.110] ------------------------------
+[11:50:22.110] UIMovementSnapping v1.0.0
+[11:50:22.111] by Roast
+[11:50:22.112] Assembly: UIMovementSnapping.dll
+[11:50:22.113] ------------------------------
+[11:50:22.117] ------------------------------
+[11:50:22.118] UnityExplorer v4.12.6
+[11:50:22.119] by Sinai, yukieiji
+[11:50:22.120] Assembly: UnityExplorer.ML.IL2CPP.CoreCLR.dll
+[11:50:22.121] ------------------------------
+[11:50:22.122] ------------------------------
+[11:50:22.123] 10 Mods loaded.
+
+[11:50:23.574] [Il2CppInterop] Class::Init signatures have been exhausted, using a substitute!
+[11:50:23.658] [Il2CppInterop] Registered mono type Il2CppInterop.Runtime.DelegateSupport+Il2CppToMonoDelegateReference in il2cpp domain
+[11:50:23.688] [Il2CppInterop] Registered mono type MelonLoader.Support.MonoEnumeratorWrapper in il2cpp domain
+[11:50:23.694] [Il2CppInterop] Registered mono type MelonLoader.Support.SM_Component in il2cpp domain
+[11:50:23.713] [Il2CppICallInjector] Registered mono icall UnityEngine.Transform::SetAsLastSibling in il2cpp domain
+[11:50:23.716] Support Module Loaded: F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\MelonLoader\Dependencies\SupportModules\Il2Cpp.dll
+[11:50:23.721] [Il2CppInterop] Registered mono type PantheonQuestProgressTrackerMod.Components.GiverNameHolder in il2cpp domain
+[11:50:23.722] [Il2CppInterop] Registered mono type PantheonQuestProgressTrackerMod.Components.ImageOpacityHandler in il2cpp domain
+[11:50:23.724] [Il2CppInterop] Method System.Collections.IEnumerator FadeTo(UnityEngine.UI.Image, Single, Single) on type PantheonQuestProgressTrackerMod.Components.MouseOverOpacityHandler has unsupported return type System.Collections.IEnumerator
+[11:50:23.726] [Il2CppInterop] Registered mono type PantheonQuestProgressTrackerMod.Components.MouseOverOpacityHandler in il2cpp domain
+[11:50:23.727] [Il2CppInterop] Registered mono type PantheonQuestProgressTrackerMod.Components.ObjectiveHoverHandler in il2cpp domain
+[11:50:23.729] [Il2CppInterop] Registered mono type PantheonQuestProgressTrackerMod.Components.QuestInfoHolder in il2cpp domain
+[11:50:23.730] [Il2CppInterop] Registered mono type PantheonQuestProgressTrackerMod.Components.QuestLoadWaiter in il2cpp domain
+[11:50:23.731] [Il2CppInterop] Registered mono type PantheonQuestProgressTrackerMod.Components.QuestTitleHolder in il2cpp domain
+[11:50:23.732] [Il2CppInterop] Registered mono type PantheonQuestProgressTrackerMod.Components.TrackerPositionSaver in il2cpp domain
+[11:50:23.736] [Il2CppInterop] Registered mono type PantheonQuestProgressTrackerMod.Components.UiJournalCheckBox in il2cpp domain
+[11:50:23.737] [Il2CppInterop] Registered mono type PantheonQuestProgressTrackerMod.Components.WindowResizeHandle in il2cpp domain
+[11:50:23.738] [Il2CppInterop] Registered mono type PantheonStorageAsBagMod.Components.BagPositionSaver in il2cpp domain
+[11:50:23.743] [Il2CppInterop] Registered mono type PantheonStorageAsBagMod.Components.ButtonHoverSpriteSwap in il2cpp domain
+[11:50:23.745] [Il2CppInterop] Registered mono type PantheonStorageAsBagMod.Components.CurrencyDisplay in il2cpp domain
+[11:50:24.218] [Coordinates_Display] Failed to initialize mod: The type initializer for 'MethodInfoStoreGeneric_AddComponent_Public_T_0`1' threw an exception.
+   at UnityEngine.GameObject.AddComponent[T]()
+   at CoordinatesDisplay.ModMain.InitializeDisplay()
+   at CoordinatesDisplay.ModMain.OnInitializeMelon()
+[11:50:24.223] [Location Display] Successfully created location display
+[11:50:24.224] [Location_Display] Location Display mod initialized!
+[11:50:24.247] [Coordinates_Display] Preferences saved!
+[11:50:24.248] [Location_Display] Preferences saved!
+[11:50:24.251] [UIMovementSnapping] Preferences Saved!
+[11:50:24.256] [UnityExplorer] UnityExplorer 4.12.6 initializing...
+[11:50:24.273] [UnityExplorer] [UniverseLib] UniverseLib 1.5.10 initializing...
+[11:50:24.275] [Il2CppInterop] Registered mono type UniverseLib.UniversalBehaviour in il2cpp domain
+[11:50:24.943] [UnityExplorer] [UniverseLib] THIS WARNING IS NOT BUG!!!! DON'T REPORT THIS!!!!!
+ Can't cache type named <>c Error: System.TypeLoadException: GenericArguments[0], 'UnityEngine.UIElements.PointerStationaryEvent', on 'UnityEngine.UIElements.EventBase`1[T]' violates the constraint of type parameter 'T'.
+   at System.RuntimeTypeHandle.GetDeclaringType(RuntimeType type)
+   at System.RuntimeType.RuntimeTypeCache.GetEnclosingType()
+   at System.RuntimeType.RuntimeTypeCache.GetNameSpace()
+   at System.RuntimeType.get_Namespace()
+   at UniverseLib.ReflectionUtility.CacheTypes(Assembly asm) in D:\a\UnityExplorer\UnityExplorer\UniverseLib\src\Reflection\ReflectionUtility.cs:line 126
+[11:50:24.970] [Il2CppInterop] Registered mono type UniverseLib.Runtime.Il2Cpp.Il2CppManagedEnumerator in il2cpp domain
+[11:50:24.992] [UnityExplorer] [UniverseLib] Finished UniverseLib initial setup.
+[11:50:24.999] [Il2CppInterop] Registered mono type UnityExplorer.ExplorerBehaviour in il2cpp domain
+[11:50:25.055] [UnityExplorer] Initialized UnityCrashPrevention for: Canvas.get_renderingDisplaySize
+[11:50:27.828] [Pantheon Storage As Bag Mod] MelonPreferences Loaded from F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\UserData\StorageAsBagMod.cfg
+[11:50:27.834] [Pantheon Storage As Bag Mod] MelonPreferences Saved to F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\UserData\StorageAsBagMod.cfg
+[11:50:27.835] [Coordinates_Display] Preferences saved!
+[11:50:27.836] [Location_Display] Preferences saved!
+Setting breakpad minidump AppID = 3107230
+SteamInternal_SetMinidumpSteamID:  Caching Steam ID:  76561197960451677 [API loaded no]
+[11:50:29.544] [UnityExplorer] [UniverseLib] Loaded Unhollowed modules in 4.5690002 seconds.
+[11:50:29.867] [UnityExplorer] [UniverseLib] Setup deobfuscation cache in 0.32200003 seconds.
+[11:50:29.873] [UnityExplorer] [UniverseLib] Initialized Legacy Input support
+[11:50:30.077] [UnityExplorer] [UniverseLib]     IL2CPP method has no corresponding pointer, aborting patch of UnityEngine.AssetBundle.UnloadAllAssetBundles
+[11:50:30.085] [Il2CppInterop] Registered mono type UniverseLib.AssetBundle in il2cpp domain
+[11:50:30.100] [Il2CppICallInjector] Registered mono icall UnityEngine.AssetBundle::LoadFromMemory_Internal in il2cpp domain
+[11:50:30.109] [Il2CppInterop] During invoking native->managed trampoline
+System.MissingMethodException: Method not found: 'Void Il2CppSystem.Span`1..ctor(Il2CppInterop.Runtime.InteropTypes.Arrays.Il2CppReferenceArray`1<!0>)'.
+   at UnityEngine.AssetBundle.LoadFromMemory_Internal(Il2CppStructArray`1 binary, UInt32 crc)
+   at (il2cpp -> managed) LoadFromMemory_Internal(IntPtr , UInt32 , Il2CppMethodInfo* )
+[11:50:30.112] [UnityExplorer] [UniverseLib] Could not load UniverseLib UI modern Bundle!
+[11:50:30.132] [UnityExplorer] [UniverseLib] UniverseLib 1.5.10 initialized.
+[11:50:30.146] [UnityExplorer] Creating UI...
+[11:50:30.990] [UnityExplorer] UnityExplorer 4.12.6 (IL2CPP) initialized.
+[11:50:44.227] [Coordinates_Display] Preferences saved!
+[11:50:44.228] [Location_Display] Preferences saved!
+[11:50:44.243] [Coordinates_Display] Preferences saved!
+[11:50:44.244] [Location_Display] Preferences saved!
+[11:50:54.555] [Pantheon Quest Progress Tracker] MelonPreferences Loaded from F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\UserData\QuestProgressTrackerMod.cfg
+[11:50:54.565] [Pantheon Quest Progress Tracker] MelonPreferences Saved to F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\UserData\QuestProgressTrackerMod.cfg
+[11:50:54.567] [Coordinates_Display] Preferences saved!
+[11:50:54.568] [Location_Display] Preferences saved!
+[11:50:54.573] [Pantheon Quest Progress Tracker] MelonPreferences Saved to F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\UserData\QuestProgressTrackerMod.cfg
+[11:50:54.574] [Coordinates_Display] Preferences saved!
+[11:50:54.575] [Location_Display] Preferences saved!
+[11:50:54.590] [Pantheon Quest Progress Tracker] MelonPreferences Saved to F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\UserData\QuestProgressTrackerMod.cfg
+[11:50:54.591] [Coordinates_Display] Preferences saved!
+[11:50:54.592] [Location_Display] Preferences saved!
