@@ -401,5 +401,5 @@ FodyWeavers.xsd
 .idea
 
 # Misc
-.specstory
-.cursor
+.specstory/
+.cursor/
