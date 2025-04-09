@@ -1,164 +1,172 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Il2CppTMPro;
-using MelonLoader;
 using System;
+using System.Collections.Generic;
+using MelonLoader;
+using Il2Cpp;
 using LocationDisplay.Hooks;
+using Il2CppInterop.Runtime.InteropTypes;
+using Il2CppInterop.Runtime.Attributes;
 
 namespace LocationDisplay
 {
+    /// <summary>
+    /// UI component that displays the player's current location and time in-game.
+    /// This class handles the creation and management of the display elements.
+    /// </summary>
     public class LocationDisplayUI : MonoBehaviour
     {
-        private static LocationDisplayUI instance;
-        private TextMeshProUGUI displayText;
-        private RectTransform rectTransform;
-        private bool isDragging;
-        private Vector2 dragOffset;
+        // Static instance for easy access from other parts of the mod
+        public static LocationDisplayUI Instance { get; private set; }
 
-        public static LocationDisplayUI CreateUI(Transform parent)
+        // UI text components for displaying location and time
+        private TextMeshProUGUI locationText;
+        private TextMeshProUGUI timeText;
+
+        /// <summary>
+        /// Initializes the UI components and sets up the display.
+        /// This method creates the necessary GameObjects and configures their properties.
+        /// </summary>
+        public void Initialize()
         {
             try
             {
-                if (instance != null)
+                // Set the static instance for global access
+                Instance = this;
+                MelonLogger.Msg("[LocationDisplay] UI component initialized");
+
+                // Create and configure the location text display
+                var locationObj = new GameObject("LocationText");
+                locationObj.transform.SetParent(transform, false);
+                
+                // Set up the RectTransform for proper positioning
+                var locationRect = locationObj.AddComponent<RectTransform>();
+                locationRect.anchorMin = new Vector2(0, 1);  // Anchor to top-left
+                locationRect.anchorMax = new Vector2(1, 1);  // Stretch horizontally
+                locationRect.pivot = new Vector2(0.5f, 1);   // Pivot at top-center
+                locationRect.anchoredPosition = new Vector2(0, 0);
+                locationRect.sizeDelta = new Vector2(0, 30); // Fixed height
+
+                // Add and configure the TextMeshProUGUI component
+                locationText = locationObj.AddComponent<TextMeshProUGUI>();
+                if (locationText != null)
                 {
-                    MelonLogger.Warning("LocationDisplayUI instance already exists!");
-                    return instance;
+                    locationText.fontSize = 16;
+                    locationText.alignment = TextAlignmentOptions.Left;
+                    locationText.text = "Location: Unknown";
+                    locationText.color = Color.white;
+                    locationText.enableWordWrapping = false;
+                    locationText.overflowMode = TextOverflowModes.Truncate;
+                }
+                else
+                {
+                    MelonLogger.Error("[LocationDisplay] Failed to create location text component");
+                    return;
                 }
 
-                MelonLogger.Msg("Creating LocationDisplayUI...");
-                var go = new GameObject("LocationDisplay");
-                go.transform.SetParent(parent, false);
-                instance = go.AddComponent<LocationDisplayUI>();
-                return instance;
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"Failed to create LocationDisplayUI: {ex}");
-                return null;
-            }
-        }
+                // Create and configure the time text display
+                var timeObj = new GameObject("TimeText");
+                timeObj.transform.SetParent(transform, false);
+                
+                // Set up the RectTransform for proper positioning
+                var timeRect = timeObj.AddComponent<RectTransform>();
+                timeRect.anchorMin = new Vector2(0, 1);      // Anchor to top-left
+                timeRect.anchorMax = new Vector2(1, 1);      // Stretch horizontally
+                timeRect.pivot = new Vector2(0.5f, 1);       // Pivot at top-center
+                timeRect.anchoredPosition = new Vector2(0, -30); // Position below location text
+                timeRect.sizeDelta = new Vector2(0, 30);     // Fixed height
 
-        private void Awake()
-        {
-            try
-            {
-                MelonLogger.Msg("LocationDisplayUI Awake - Initializing UI elements...");
-                InitializeUI();
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"Error in LocationDisplayUI.Awake: {ex}");
-            }
-        }
-
-        private void InitializeUI()
-        {
-            // Setup RectTransform
-            rectTransform = gameObject.GetComponent<RectTransform>();
-            if (rectTransform == null)
-                rectTransform = gameObject.AddComponent<RectTransform>();
-
-            rectTransform.sizeDelta = new Vector2(200, 60);
-            rectTransform.anchorMin = new Vector2(0, 0);
-            rectTransform.anchorMax = new Vector2(0, 0);
-            rectTransform.pivot = new Vector2(0, 0);
-            rectTransform.anchoredPosition = new Vector2(10, 10);
-
-            // Add background image
-            var background = gameObject.AddComponent<Image>();
-            background.color = new Color(0, 0, 0, 0.5f);
-            background.raycastTarget = true;
-
-            // Add text component
-            var textObj = new GameObject("Text");
-            textObj.transform.SetParent(transform, false);
-
-            displayText = textObj.AddComponent<TextMeshProUGUI>();
-            displayText.fontSize = 16;
-            displayText.alignment = TextAlignmentOptions.Left;
-            displayText.color = Color.white;
-            displayText.text = "Zone: Loading...\nTime: --:--";
-
-            var textRect = displayText.rectTransform;
-            textRect.anchorMin = Vector2.zero;
-            textRect.anchorMax = Vector2.one;
-            textRect.offsetMin = new Vector2(5, 5);
-            textRect.offsetMax = new Vector2(-5, -5);
-
-            MelonLogger.Msg("UI elements initialized successfully");
-        }
-
-        private void Update()
-        {
-            if (!gameObject.activeInHierarchy) return;
-
-            try
-            {
-                UpdateDisplay();
-                HandleDragging();
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"Error in LocationDisplayUI.Update: {ex}");
-            }
-        }
-
-        private void UpdateDisplay()
-        {
-            if (displayText == null)
-            {
-                MelonLogger.Error("DisplayText component is null!");
-                return;
-            }
-
-            try
-            {
-                string zone = GameHooks.GetCurrentZone();
-                string time = GameHooks.GetCurrentTime();
-                string newText = $"Zone: {zone}\nTime: {time}";
-
-                if (displayText.text != newText)
+                // Add and configure the TextMeshProUGUI component
+                timeText = timeObj.AddComponent<TextMeshProUGUI>();
+                if (timeText != null)
                 {
-                    displayText.text = newText;
-                    MelonLogger.Msg($"Display updated - Zone: {zone}, Time: {time}");
+                    timeText.fontSize = 16;
+                    timeText.alignment = TextAlignmentOptions.Left;
+                    timeText.text = "Time: 00:00";
+                    timeText.color = Color.white;
+                    timeText.enableWordWrapping = false;
+                    timeText.overflowMode = TextOverflowModes.Truncate;
                 }
-            }
-            catch (Exception ex)
-            {
-                MelonLogger.Error($"Error updating display: {ex}");
-            }
-        }
-
-        private void HandleDragging()
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                Vector2 mousePos = Input.mousePosition;
-                if (RectTransformUtility.RectangleContainsScreenPoint(rectTransform, mousePos))
+                else
                 {
-                    isDragging = true;
-                    dragOffset = rectTransform.anchoredPosition - (Vector2)Input.mousePosition;
-                    MelonLogger.Msg("Started dragging UI");
+                    MelonLogger.Error("[LocationDisplay] Failed to create time text component");
+                    return;
                 }
-            }
-            else if (Input.GetMouseButtonUp(0) && isDragging)
-            {
-                isDragging = false;
-                MelonLogger.Msg($"Stopped dragging UI - Position: {rectTransform.anchoredPosition}");
-            }
 
-            if (isDragging)
+                // Create and configure the background panel
+                var bgObj = new GameObject("Background");
+                bgObj.transform.SetParent(transform, false);
+                bgObj.transform.SetAsFirstSibling(); // Ensure background is behind text
+                
+                // Set up the RectTransform to cover the entire display area
+                var bgRect = bgObj.AddComponent<RectTransform>();
+                bgRect.anchorMin = Vector2.zero;  // Anchor to bottom-left
+                bgRect.anchorMax = Vector2.one;   // Anchor to top-right
+                bgRect.sizeDelta = Vector2.zero;  // Fill the entire space
+
+                // Add and configure the background image
+                var bgImage = bgObj.AddComponent<Image>();
+                bgImage.color = new Color(0, 0, 0, 0.5f); // Semi-transparent black background
+
+                MelonLogger.Msg("[LocationDisplay] UI elements created and configured");
+            }
+            catch (System.Exception ex)
             {
-                rectTransform.anchoredPosition = (Vector2)Input.mousePosition + dragOffset;
+                MelonLogger.Error($"[LocationDisplay] Error in Initialize: {ex}");
             }
         }
 
+        /// <summary>
+        /// Updates the displayed player information with current location and time.
+        /// This method is called periodically to keep the display current.
+        /// </summary>
+        public void UpdatePlayerInfo()
+        {
+            try
+            {
+                // Get current player information from GameHooks
+                var (zone, time) = GameHooks.GetPlayerInfo();
+
+                // Update the location text if the component exists
+                if (locationText != null)
+                {
+                    locationText.text = $"Location: {zone}";
+                }
+
+                // Update the time text if the component exists
+                if (timeText != null)
+                {
+                    timeText.text = $"Time: {time}";
+                }
+
+                MelonLogger.Msg($"[LocationDisplay] UI updated - Zone: {zone}, Time: {time}");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"[LocationDisplay] Error in UpdatePlayerInfo: {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Called when the component is destroyed.
+        /// Cleans up the static instance to prevent memory leaks.
+        /// </summary>
         private void OnDestroy()
         {
-            if (instance == this)
+            try
             {
-                instance = null;
-                MelonLogger.Msg("LocationDisplayUI instance destroyed");
+                // Clean up the static instance if it points to this object
+                if (Instance == this)
+                {
+                    Instance = null;
+                }
+
+                MelonLogger.Msg("[LocationDisplay] UI component destroyed");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"[LocationDisplay] Error in OnDestroy: {ex}");
             }
         }
     }

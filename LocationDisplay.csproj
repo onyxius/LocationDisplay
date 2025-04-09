@@ -88,6 +88,14 @@
 			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
+		<Reference Include="Il2CppViNL">
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\Il2CppViNL.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="Il2CppViNL.CoreNet">
+			<HintPath>D:\Game_Modding\PantheonRotF\MelonLoader\Il2CppAssemblies\Il2CppViNL.CoreNet.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 	</ItemGroup>
 
 	<PropertyGroup>
@@ -103,6 +111,9 @@
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="powershell -Command &quot;Write-Host 'Copying DLL to Mods folder...'; Copy-Item -Path '$(TargetPath)' -Destination 'F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\Mods' -Force -Verbose; if ($LASTEXITCODE -ne 0) { Write-Host 'Error copying file'; exit 1 } else { Write-Host 'File copied successfully' }&quot;" />
+		<PropertyGroup>
+			<ModsPath>F:\Program Files (x86)\Steam\steamapps\common\Pantheon Rise of the Fallen\Mods</ModsPath>
+		</PropertyGroup>
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModsPath)" />
 	</Target>
 </Project>

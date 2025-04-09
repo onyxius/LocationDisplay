@@ -5,163 +5,235 @@ using System;
 using Il2CppTMPro;
 using Il2CppInterop.Runtime.InteropTypes;
 using Il2Cpp;
+using Il2CppSystem;
+using Il2CppSystem.Collections.Generic;
+using System.Reflection;
+using Il2CppInterop.Runtime.Attributes;
 
 namespace LocationDisplay.Hooks
 {
+    /// <summary>
+    /// Static class that handles game hooks and player information retrieval.
+    /// This class uses Harmony to patch game methods and provides access to player data.
+    /// </summary>
     public static class GameHooks
     {
-        private static string currentZone = "Unknown";
-        private static string currentTime = "00:00";
-        private static Il2CppObjectBase localPlayer;
+        // Static instance of the Harmony patcher
+        private static Harmony harmony;
 
-        [HarmonyPatch(typeof(Il2CppScripts.Player), "Update")]
-        public class PlayerUpdateHook
+        // Reference to the local player object
+        private static EntityPlayerGameObject localPlayer;
+
+        // Flag to track if hooks have been initialized
+        private static bool hooksInitialized = false;
+
+        /// <summary>
+        /// Initializes the Harmony hooks for the mod.
+        /// This method should be called once when the mod starts.
+        /// </summary>
+        public static void InitializeHooks()
         {
-            private static void Postfix(Il2CppScripts.Player __instance)
+            try
+            {
+                if (hooksInitialized) return;
+
+                // Create a new Harmony instance with a unique ID
+                harmony = new Harmony("com.locationdisplay.patches");
+                
+                // Apply the patches to the game methods
+                harmony.PatchAll();
+                
+                hooksInitialized = true;
+                MelonLogger.Msg("[LocationDisplay] Hooks initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[LocationDisplay] Failed to initialize hooks: {ex}");
+            }
+        }
+
+        /// <summary>
+        /// Harmony patch for the player's NetworkStart method.
+        /// This is called when a player object is created in the game.
+        /// </summary>
+        [HarmonyPatch(typeof(EntityPlayerGameObject), "NetworkStart")]
+        private static class PlayerNetworkStart
+        {
+            /// <summary>
+            /// Postfix method that runs after the original NetworkStart.
+            /// Used to identify and store the local player reference.
+            /// </summary>
+            [HarmonyPostfix]
+            private static void Postfix(EntityPlayerGameObject __instance)
             {
                 try
                 {
-                    if (__instance == null)
+                    // Get the NetworkId field using reflection
+                    var networkIdField = typeof(EntityPlayerGameObject).GetField("NetworkId", BindingFlags.Instance | BindingFlags.NonPublic);
+                    if (networkIdField == null)
                     {
-                        MelonLogger.Msg("Player instance is null in Update");
+                        MelonLogger.Error("[LocationDisplay] Failed to find NetworkId field");
                         return;
                     }
-                    localPlayer = __instance;
 
-                    // Get current zone name
-                    var zoneManager = GameObject.Find("ZoneManager");
-                    if (zoneManager != null)
+                    // Get the local player ID field
+                    var localPlayerIdField = typeof(EntityPlayerGameObject).GetField("LocalPlayerId", BindingFlags.Static | BindingFlags.NonPublic);
+                    if (localPlayerIdField == null)
                     {
-                        var zoneName = zoneManager.GetComponent<TextMeshProUGUI>();
-                        if (zoneName != null)
-                        {
-                            currentZone = zoneName.text;
-                            MelonLogger.Msg($"Zone updated: {currentZone}");
-                        }
-                        else
-                        {
-                            MelonLogger.Msg("ZoneManager found but no TextMeshProUGUI component");
-                        }
-                    }
-                    else
-                    {
-                        MelonLogger.Msg("ZoneManager not found");
+                        MelonLogger.Error("[LocationDisplay] Failed to find LocalPlayerId field");
+                        return;
                     }
 
-                    // Get current time
-                    var timeDisplay = GameObject.Find("TimeDisplay");
-                    if (timeDisplay != null)
+                    // Get the current values
+                    int networkId = (int)networkIdField.GetValue(__instance);
+                    int localPlayerId = (int)localPlayerIdField.GetValue(null);
+
+                    MelonLogger.Msg($"[LocationDisplay] Player spawned - NetworkId: {networkId}, LocalPlayerId: {localPlayerId}");
+
+                    // Check if this is the local player
+                    if (networkId == localPlayerId)
                     {
-                        var timeText = timeDisplay.GetComponent<TextMeshProUGUI>();
-                        if (timeText != null)
-                        {
-                            currentTime = timeText.text;
-                            MelonLogger.Msg($"Time updated: {currentTime}");
-                        }
-                        else
-                        {
-                            MelonLogger.Msg("TimeDisplay found but no TextMeshProUGUI component");
-                        }
-                    }
-                    else
-                    {
-                        MelonLogger.Msg("TimeDisplay not found");
+                        localPlayer = __instance;
+                        MelonLogger.Msg("[LocationDisplay] Local player set");
                     }
                 }
                 catch (Exception ex)
                 {
-                    MelonLogger.Error($"Error in PlayerUpdateHook: {ex}");
+                    MelonLogger.Error($"[LocationDisplay] Error in PlayerNetworkStart: {ex}");
                 }
             }
         }
 
-        [HarmonyPatch(typeof(Il2CppScripts.Player), "OnDestroy")]
-        public class PlayerDestroyHook
+        /// <summary>
+        /// Harmony patch for the player's OnDestroy method.
+        /// This is called when a player object is destroyed in the game.
+        /// </summary>
+        [HarmonyPatch(typeof(EntityPlayerGameObject), "OnDestroy")]
+        private static class PlayerDestroyHook
         {
-            private static void Postfix(Il2CppScripts.Player __instance)
+            /// <summary>
+            /// Postfix method that runs after the original OnDestroy.
+            /// Used to clear the local player reference when the player is destroyed.
+            /// </summary>
+            [HarmonyPostfix]
+            private static void Postfix(EntityPlayerGameObject __instance)
             {
                 try
                 {
-                    if (__instance == localPlayer)
+                    // Check if the destroyed player is the local player
+                    if (localPlayer == __instance)
                     {
                         localPlayer = null;
-                        MelonLogger.Msg("Player destroyed");
+                        MelonLogger.Msg("[LocationDisplay] Local player cleared");
                     }
                 }
                 catch (Exception ex)
                 {
-                    MelonLogger.Error($"Error in PlayerDestroyHook: {ex}");
+                    MelonLogger.Error($"[LocationDisplay] Error in PlayerDestroyHook: {ex}");
                 }
             }
         }
 
-        public static string GetCurrentZone() => currentZone;
-        public static string GetCurrentTime() => currentTime;
-        public static Il2CppObjectBase GetLocalPlayer() => localPlayer;
-
-        public static void OnSceneWasLoaded(int buildIndex, string sceneName)
+        /// <summary>
+        /// Retrieves the current player's location and time information.
+        /// </summary>
+        /// <returns>A tuple containing the zone name and current time.</returns>
+        public static (string zone, string time) GetPlayerInfo()
         {
             try
             {
-                if (string.IsNullOrEmpty(sceneName))
+                // Default values if information cannot be retrieved
+                string zone = "Unknown";
+                string time = "00:00";
+
+                // Check if we have a valid local player reference
+                if (localPlayer != null)
                 {
-                    MelonLogger.Msg("Scene name is null or empty");
-                    return;
+                    // Get the current zone from the player's position
+                    zone = GetCurrentZone();
+                    
+                    // Get the current game time
+                    time = GetCurrentTime();
                 }
 
-                MelonLogger.Msg($"Scene loaded: {sceneName} (build index: {buildIndex})");
-                OnSceneWasLoadedInternal();
+                return (zone, time);
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Error in OnSceneWasLoaded: {ex}");
+                MelonLogger.Error($"[LocationDisplay] Error in GetPlayerInfo: {ex}");
+                return ("Error", "Error");
             }
         }
 
-        private static void OnSceneWasLoadedInternal()
+        /// <summary>
+        /// Determines the current zone based on the player's position.
+        /// </summary>
+        /// <returns>The name of the current zone.</returns>
+        private static string GetCurrentZone()
         {
             try
             {
-                var activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-                if (!activeScene.IsValid())
+                // Get the ZoneManager instance
+                var zoneManager = GameObject.Find("ZoneManager");
+                if (zoneManager == null)
                 {
-                    MelonLogger.Msg("Invalid active scene");
-                    return;
+                    MelonLogger.Error("[LocationDisplay] ZoneManager not found");
+                    return "Unknown";
                 }
 
-                MelonLogger.Msg($"Active scene: {activeScene.name}");
-
-                var player = GameObject.Find("Player");
-                if (player == null)
+                // Get the current zone component
+                var currentZone = zoneManager.GetComponent<Zone>();
+                if (currentZone == null)
                 {
-                    player = GameObject.Find("LocalPlayer");
-                    MelonLogger.Msg("Player not found, trying LocalPlayer");
+                    MelonLogger.Error("[LocationDisplay] CurrentZone component not found");
+                    return "Unknown";
                 }
 
-                if (player != null)
-                {
-                    localPlayer = player.GetComponent<Il2CppScripts.Player>();
-                    if (localPlayer != null)
-                    {
-                        MelonLogger.Msg("Player found in scene");
-                    }
-                    else
-                    {
-                        MelonLogger.Msg("Player GameObject found but no Player component");
-                    }
-                }
-                else
-                {
-                    MelonLogger.Msg("No player found in scene");
-                }
+                return currentZone.ZoneName;
             }
             catch (Exception ex)
             {
-                MelonLogger.Error($"Error in OnSceneWasLoadedInternal: {ex}");
+                MelonLogger.Error($"[LocationDisplay] Error in GetCurrentZone: {ex}");
+                return "Unknown";
             }
         }
 
-        public static void OnPlayerSpawned(Il2CppObjectBase player)
+        /// <summary>
+        /// Retrieves the current game time.
+        /// </summary>
+        /// <returns>The current time formatted as HH:MM.</returns>
+        private static string GetCurrentTime()
+        {
+            try
+            {
+                // Get the TimeDisplay instance
+                var timeDisplay = GameObject.Find("TimeDisplay");
+                if (timeDisplay == null)
+                {
+                    MelonLogger.Error("[LocationDisplay] TimeDisplay not found");
+                    return "00:00";
+                }
+
+                // Get the current time component
+                var currentTime = timeDisplay.GetComponent<TimeDisplay>();
+                if (currentTime == null)
+                {
+                    MelonLogger.Error("[LocationDisplay] CurrentTime component not found");
+                    return "00:00";
+                }
+
+                return currentTime.GetFormattedTime();
+            }
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[LocationDisplay] Error in GetCurrentTime: {ex}");
+                return "00:00";
+            }
+        }
+
+        public static EntityPlayerGameObject GetLocalPlayer() => localPlayer;
+
+        public static void OnPlayerSpawned(EntityPlayerGameObject player)
         {
             try
             {
@@ -173,13 +245,13 @@ namespace LocationDisplay.Hooks
                 MelonLogger.Msg("Player spawned");
                 localPlayer = player;
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 MelonLogger.Error($"Error in OnPlayerSpawned: {ex}");
             }
         }
 
-        public static void OnPlayerDespawned(Il2CppObjectBase player)
+        public static void OnPlayerDespawned(EntityPlayerGameObject player)
         {
             try
             {
@@ -189,12 +261,12 @@ namespace LocationDisplay.Hooks
                     return;
                 }
                 MelonLogger.Msg("Player despawned");
-                if (localPlayer == player)
+                if (ReferenceEquals(localPlayer, player))
                 {
                     localPlayer = null;
                 }
             }
-            catch (Exception ex)
+            catch (System.Exception ex)
             {
                 MelonLogger.Error($"Error in OnPlayerDespawned: {ex}");
             }
