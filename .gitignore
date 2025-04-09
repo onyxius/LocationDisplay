@@ -400,6 +400,26 @@ FodyWeavers.xsd
 *.sln.iml
 .idea
 
-# Misc
-.specstory/
+# Project specific ignores
+Latest.log
+LocationDisplay.dll
 .cursor/
+.specstory/
+obj/
+bin/
+*.dll
+*.pdb
+*.exe
+*.config
+*.cache
+*.manifest
+*.resources
+*.dll.config
+*.cache
+*.manifest
+*.resources
+*.dll.config
+*.cache
+*.manifest
+*.resources
+*.dll.config
