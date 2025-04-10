@@ -1,169 +1,150 @@
-using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using Il2CppTMPro;
-using MelonLoader;
-using Il2CppInterop.Runtime;
 using Il2Cpp;
+using MelonLoader;
+using System;
+using Exception = System.Exception;
 
 namespace LocationDisplay.Hooks
 {
     public static class UIHooks
     {
         private static GameObject displayPanel;
-        private static TextMeshProUGUI displayText;
-        private static RectTransform displayRect;
-        private static bool isInitialized = false;
+        private static Text locationText;
+        private static Text timeText;
+        private static Button copyButton;
 
-        public static void Initialize()
+        public static void InitializeUI()
         {
-            if (isInitialized) return;
-
             try
             {
-                // Create canvas if it doesn't exist
-                var canvasObj = new GameObject("LocationDisplayCanvas");
-                var canvas = canvasObj.AddComponent<Canvas>();
-                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                canvas.sortingOrder = 9999; // Ensure it's on top
-                canvasObj.AddComponent<CanvasScaler>();
-                canvasObj.AddComponent<GraphicRaycaster>();
-                UnityEngine.Object.DontDestroyOnLoad(canvasObj);
+                // Get the front canvas from UIPanelRoots
+                var canvas = UIPanelRoots.Instance?.Front;
+                if (canvas == null)
+                {
+                    MelonLogger.Error("[LocationDisplay] Could not find front canvas");
+                    return;
+                }
 
-                // Create panel
+                // Create the display panel
                 displayPanel = new GameObject("LocationDisplayPanel");
-                displayPanel.transform.SetParent(canvasObj.transform, false);
+                displayPanel.transform.SetParent(canvas.transform, false);
+                displayPanel.layer = LayerMask.NameToLayer("UI");
 
-                // Add RectTransform
-                displayRect = displayPanel.AddComponent<RectTransform>();
-                displayRect.sizeDelta = new Vector2(300, 60);
+                // Add UIWindowPanel component
+                var windowPanel = displayPanel.AddComponent<UIWindowPanel>();
+                windowPanel.SetTitle("Location Display");
 
-                // Set anchoring (bottom-left)
-                displayRect.anchorMin = new Vector2(0, 0);
-                displayRect.anchorMax = new Vector2(0, 0);
-                displayRect.pivot = new Vector2(0, 0);
-                displayRect.anchoredPosition = new Vector2(ModMain.xPosition, ModMain.yPosition);
+                // Add UIDraggable component
+                var draggable = displayPanel.AddComponent<UIDraggable>();
+                draggable.SetDragTarget(displayPanel.GetComponent<RectTransform>());
 
-                // Add background image and make it draggable
-                var image = displayPanel.AddComponent<Image>();
-                image.color = new Color(0, 0, 0, 0.5f);
-                
-                // Add window resize handle component
-                var windowHandle = displayPanel.AddComponent<WindowResizeHandle>();
-                windowHandle.Initialize(displayRect);
+                // Set up the panel's RectTransform
+                var rectTransform = displayPanel.GetComponent<RectTransform>();
+                rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
+                rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+                rectTransform.sizeDelta = new Vector2(300, 100);
+                rectTransform.anchoredPosition = Vector2.zero;
 
-                // Create text object
-                var textObj = new GameObject("LocationDisplayText");
-                textObj.transform.SetParent(displayPanel.transform, false);
+                // Add background image
+                var background = displayPanel.AddComponent<Image>();
+                background.color = new Color(0f, 0f, 0f, 0.7f);
 
-                // Setup text
-                var textRect = textObj.AddComponent<RectTransform>();
-                textRect.anchorMin = new Vector2(0, 0);
-                textRect.anchorMax = new Vector2(1, 1);
-                textRect.offsetMin = Vector2.zero;
-                textRect.offsetMax = Vector2.zero;
+                // Create location text
+                var locationObj = new GameObject("LocationText");
+                locationObj.transform.SetParent(displayPanel.transform, false);
+                locationText = locationObj.AddComponent<Text>();
+                locationText.color = Color.white;
+                locationText.fontSize = 14;
+                locationText.alignment = TextAnchor.MiddleLeft;
+                locationText.rectTransform.anchorMin = new Vector2(0, 0);
+                locationText.rectTransform.anchorMax = new Vector2(1, 1);
+                locationText.rectTransform.offsetMin = new Vector2(10, 10);
+                locationText.rectTransform.offsetMax = new Vector2(-10, -10);
 
-                // Create TextMeshProUGUI using Il2Cpp interop
-                var tmpType = Il2CppType.Of<TextMeshProUGUI>();
-                displayText = textObj.AddComponent(tmpType).Cast<TextMeshProUGUI>();
-                displayText.alignment = TextAlignmentOptions.Center;
-                displayText.fontSize = ModMain.Config.GetEntry<int>("fontSize").Value;
-                displayText.color = Color.white;
+                // Create time text
+                var timeObj = new GameObject("TimeText");
+                timeObj.transform.SetParent(displayPanel.transform, false);
+                timeText = timeObj.AddComponent<Text>();
+                timeText.color = Color.white;
+                timeText.fontSize = 14;
+                timeText.alignment = TextAnchor.MiddleRight;
+                timeText.rectTransform.anchorMin = new Vector2(0, 0);
+                timeText.rectTransform.anchorMax = new Vector2(1, 1);
+                timeText.rectTransform.offsetMin = new Vector2(10, 10);
+                timeText.rectTransform.offsetMax = new Vector2(-10, -10);
 
-                isInitialized = true;
-                MelonLogger.Msg("Successfully created location display");
+                // Create copy button
+                var buttonObj = new GameObject("CopyButton");
+                buttonObj.transform.SetParent(displayPanel.transform, false);
+                copyButton = buttonObj.AddComponent<Button>();
+                var buttonText = buttonObj.AddComponent<Text>();
+                buttonText.text = "Copy";
+                buttonText.color = Color.white;
+                buttonText.fontSize = 12;
+                buttonText.alignment = TextAnchor.MiddleCenter;
+
+                var buttonRect = buttonObj.GetComponent<RectTransform>();
+                buttonRect.anchorMin = new Vector2(0.5f, 0);
+                buttonRect.anchorMax = new Vector2(0.5f, 0);
+                buttonRect.sizeDelta = new Vector2(80, 20);
+                buttonRect.anchoredPosition = new Vector2(0, 10);
+
+                // Set up button colors
+                var colors = copyButton.colors;
+                colors.normalColor = new Color(0.2f, 0.2f, 0.2f, 1f);
+                colors.highlightedColor = new Color(0.3f, 0.3f, 0.3f, 1f);
+                colors.pressedColor = new Color(0.1f, 0.1f, 0.1f, 1f);
+                copyButton.colors = colors;
+
+                // Add click handler
+                copyButton.onClick.AddListener((UnityAction)CopyLocationToClipboard);
+
+                MelonLogger.Msg("[LocationDisplay] UI initialized successfully");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                MelonLogger.Error($"Error creating display: {ex.Message}\n{ex.StackTrace}");
+                MelonLogger.Error($"[LocationDisplay] Error initializing UI: {ex}");
             }
         }
 
         public static void UpdateDisplay(string location, string time)
         {
-            if (!isInitialized)
-            {
-                Initialize();
-            }
-
             try
             {
-                if (displayText != null)
+                if (locationText != null)
                 {
-                    displayText.text = $"Location: {location}\nTime: {time}";
+                    locationText.text = location;
+                }
+                if (timeText != null)
+                {
+                    timeText.text = time;
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                MelonLogger.Error($"Error updating display: {ex.Message}\n{ex.StackTrace}");
-            }
-        }
-    }
-
-    // Window resize/drag handle component based on the Quest Progress Tracker implementation
-    public class WindowResizeHandle : MonoBehaviour
-    {
-        private RectTransform rectTransform;
-        private Vector2 dragStartPosition;
-        private Vector2 dragStartMousePosition;
-        private bool isDragging;
-
-        public void Initialize(RectTransform rect)
-        {
-            rectTransform = rect;
-        }
-
-        private void Update()
-        {
-            if (UnityEngine.Input.GetMouseButtonDown(0))
-            {
-                // Check if mouse is over the panel
-                if (RectTransformUtility.RectangleContainsScreenPoint(rectTransform, UnityEngine.Input.mousePosition))
-                {
-                    StartDragging();
-                }
-            }
-            else if (UnityEngine.Input.GetMouseButtonUp(0))
-            {
-                StopDragging();
-            }
-
-            if (isDragging)
-            {
-                UpdateDragging();
+                MelonLogger.Error($"[LocationDisplay] Error updating display: {ex}");
             }
         }
 
-        private void StartDragging()
+        private static void CopyLocationToClipboard()
         {
-            isDragging = true;
-            dragStartPosition = rectTransform.anchoredPosition;
-            dragStartMousePosition = UnityEngine.Input.mousePosition;
-        }
-
-        private void StopDragging()
-        {
-            if (isDragging)
+            try
             {
-                isDragging = false;
-                // Save the new position
-                ModMain.xPosition = rectTransform.anchoredPosition.x;
-                ModMain.yPosition = rectTransform.anchoredPosition.y;
-                ModMain.Config.GetEntry<float>("xPosition").Value = ModMain.xPosition;
-                ModMain.Config.GetEntry<float>("yPosition").Value = ModMain.yPosition;
-                ModMain.SaveConfig();
+                var (x, y, z, direction) = GameHooks.GetPlayerCoordinates();
+                var zone = GameHooks.GetCurrentZone();
+                var time = GameHooks.GetCurrentTime();
+
+                var locationString = $"Zone: {zone}\nX: {x:F2} (E/W)\nY: {y:F2} (N/S)\nZ: {z:F2} (U/D)\nTime: {time}\nDirection: {direction:F0}°";
+                GUIUtility.systemCopyBuffer = locationString;
+                MelonLogger.Msg("[LocationDisplay] Location copied to clipboard");
             }
-        }
-
-        private void UpdateDragging()
-        {
-            if (rectTransform == null) return;
-
-            Vector2 currentMousePosition = UnityEngine.Input.mousePosition;
-            Vector2 difference = currentMousePosition - dragStartMousePosition;
-
-            rectTransform.anchoredPosition = dragStartPosition + difference;
+            catch (Exception ex)
+            {
+                MelonLogger.Error($"[LocationDisplay] Error copying location to clipboard: {ex}");
+            }
         }
     }
 } 
